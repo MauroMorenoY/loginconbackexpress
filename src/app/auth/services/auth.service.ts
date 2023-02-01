@@ -2,6 +2,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, map, of, tap } from 'rxjs';
 import { authresponse, usuario } from '../interfaces/auth.interface';
+import { environment } from '../../../../environments';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +10,7 @@ import { authresponse, usuario } from '../interfaces/auth.interface';
 export class AuthService {
 
   private _user! : usuario;
-  private base : string = 'http://localhost:4000/api/auth'
+  private base : string = environment.baseUrl
 
   get usuar(){
     return {...this._user}
@@ -20,7 +21,7 @@ export class AuthService {
   registro(name : string, email: string, password : string){
 
     const body = {name,email,password}
-    return this.http.post<authresponse>(`${this.base}/new`, body)
+    return this.http.post<authresponse>(`${this.base}/auth/new`, body)
     .pipe(
       map(res => res.ok),
       catchError(err => of(err.error.msg))
@@ -30,7 +31,7 @@ export class AuthService {
   login(email: string, password : string){
 
     const body = {email, password}
-    return this.http.post<authresponse>(this.base, body)
+    return this.http.post<authresponse>(`${this.base}/auth`, body)
     .pipe(
       tap(resp =>{
         if (resp.ok){
@@ -49,7 +50,7 @@ export class AuthService {
   }
 
   validartoken(){
-    const url = `${this.base}/renew`;
+    const url = `${this.base}/auth/renew`;
     const headers = new HttpHeaders()
                     .set('x-token', localStorage.getItem('token') || '')
 
